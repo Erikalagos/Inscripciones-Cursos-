@@ -1,0 +1,360 @@
+
+-- Crear la base de datos
+CREATE DATABASE SistemaEducativo;
+GO
+
+USE SistemaEducativo;
+GO
+
+-- Tabla Carreras
+CREATE TABLE [dbo].[Carreras](
+    [id] [int] IDENTITY(1,1) NOT NULL,
+    [nombre] [varchar](100) NOT NULL,
+    [descripcion] [varchar](200) NULL,
+    [fecha_creacion] [datetime] NOT NULL DEFAULT GETDATE(),
+    PRIMARY KEY CLUSTERED ([id] ASC)
+);
+GO
+
+-- Tabla Especialidades
+CREATE TABLE [dbo].[Especialidades](
+    [id] [int] IDENTITY(1,1) NOT NULL,
+    [nombre] [varchar](100) NOT NULL,
+    [area] [varchar](100) NULL,
+    [descripcion] [varchar](200) NULL,
+    [fecha_creacion] [datetime] NOT NULL DEFAULT GETDATE(),
+    PRIMARY KEY CLUSTERED ([id] ASC)
+);
+GO
+
+-- Tabla Profesores
+CREATE TABLE [dbo].[Profesores](
+    [id] [int] IDENTITY(1,1) NOT NULL,
+    [nombre] [varchar](100) NOT NULL,
+    [carreraId] [int] NOT NULL,
+    [especialidadId] [int] NOT NULL,
+    [telefono] [varchar](20) NULL,
+    [email] [varchar](100) NULL,
+    [fecha_contratacion] [date] NOT NULL DEFAULT GETDATE(),
+    [activo] [bit] NOT NULL DEFAULT 1,
+    PRIMARY KEY CLUSTERED ([id] ASC)
+);
+GO
+
+-- Tabla Estudiantes
+CREATE TABLE [dbo].[Estudiantes](
+    [id] [int] IDENTITY(1,1) NOT NULL,
+    [nombre] [varchar](100) NOT NULL,
+    [correo] [varchar](100) NOT NULL,
+    [telefono] [varchar](20) NULL,
+    [direccion] [varchar](300) NULL,
+    [fecha_registro] [datetime] NOT NULL DEFAULT GETDATE(),
+    [activo] [bit] NOT NULL DEFAULT 1,
+    PRIMARY KEY CLUSTERED ([id] ASC)
+);
+GO
+
+-- Tabla Cursos
+CREATE TABLE [dbo].[Cursos](
+    [id] [int] IDENTITY(1,1) NOT NULL,
+    [nombre] [varchar](100) NOT NULL,
+    [descripcion] [varchar](200) NULL,
+    [profesorId] [int] NOT NULL,
+    [creditos] [int] NOT NULL DEFAULT 3,
+    [horas_duracion] [int] NULL,
+    [fecha_creacion] [datetime] NOT NULL DEFAULT GETDATE(),
+    [activo] [bit] NOT NULL DEFAULT 1,
+    PRIMARY KEY CLUSTERED ([id] ASC)
+);
+GO
+
+-- Tabla Inscripciones
+CREATE TABLE [dbo].[Inscripciones](
+    [id] [int] IDENTITY(1,1) NOT NULL,
+    [cursoId] [int] NOT NULL,
+    [estudianteId] [int] NOT NULL,
+    [fechaInscripcion] [datetime] NOT NULL DEFAULT GETDATE(),
+    [estado] [varchar](20) NOT NULL DEFAULT 'Activo',
+    [calificacion] [decimal](4,2) NULL,
+    [fecha_actualizacion] [datetime] NOT NULL DEFAULT GETDATE(),
+    PRIMARY KEY CLUSTERED ([id] ASC)
+);
+GO
+
+-- =============================================
+-- CREACIÓN DE LLAVES FORÁNEAS Y CONSTRAINTS
+-- =============================================
+
+-- Llaves foráneas para Profesores
+ALTER TABLE [dbo].[Profesores] WITH CHECK 
+ADD CONSTRAINT [FK_Profesores_Carreras] 
+FOREIGN KEY([carreraId]) REFERENCES [dbo].[Carreras] ([id]);
+GO
+
+ALTER TABLE [dbo].[Profesores] WITH CHECK 
+ADD CONSTRAINT [FK_Profesores_Especialidades] 
+FOREIGN KEY([especialidadId]) REFERENCES [dbo].[Especialidades] ([id]);
+GO
+
+-- Llave foránea para Cursos
+ALTER TABLE [dbo].[Cursos] WITH CHECK 
+ADD CONSTRAINT [FK_Cursos_Profesores] 
+FOREIGN KEY([profesorId]) REFERENCES [dbo].[Profesores] ([id]);
+GO
+
+-- Llaves foráneas para Inscripciones
+ALTER TABLE [dbo].[Inscripciones] WITH CHECK 
+ADD CONSTRAINT [FK_Inscripciones_Cursos] 
+FOREIGN KEY([cursoId]) REFERENCES [dbo].[Cursos] ([id]);
+GO
+
+ALTER TABLE [dbo].[Inscripciones] WITH CHECK 
+ADD CONSTRAINT [FK_Inscripciones_Estudiantes] 
+FOREIGN KEY([estudianteId]) REFERENCES [dbo].[Estudiantes] ([id]);
+GO
+
+-- =============================================
+-- CONSTRAINTS ADICIONALES
+-- =============================================
+
+-- Constraint para evitar duplicados en inscripciones
+ALTER TABLE [dbo].[Inscripciones] WITH CHECK
+ADD CONSTRAINT [UK_Inscripciones_Curso_Estudiante] 
+UNIQUE ([cursoId], [estudianteId]);
+GO
+
+-- Constraint para validar el estado de inscripción
+ALTER TABLE [dbo].[Inscripciones] WITH CHECK
+ADD CONSTRAINT [CK_Inscripciones_Estado] 
+CHECK ([estado] IN ('Activo', 'Completado', 'Cancelado', 'Retirado'));
+GO
+
+-- Constraint para validar calificación
+ALTER TABLE [dbo].[Inscripciones] WITH CHECK
+ADD CONSTRAINT [CK_Inscripciones_Calificacion] 
+CHECK ([calificacion] IS NULL OR ([calificacion] >= 0 AND [calificacion] <= 100));
+GO
+
+-- Constraint para validar email de estudiantes
+ALTER TABLE [dbo].[Estudiantes] WITH CHECK
+ADD CONSTRAINT [CK_Estudiantes_Email] 
+CHECK ([correo] LIKE '%_@__%.__%');
+GO
+
+-- =============================================
+-- INSERCIÓN DE DATOS DE EJEMPLO
+-- =============================================
+
+-- Insertar Carreras
+INSERT INTO [dbo].[Carreras] ([nombre], [descripcion]) VALUES
+('Ingeniería de Sistemas', 'Carrera enfocada en desarrollo de software y TI'),
+('Medicina', 'Carrera de ciencias de la salud'),
+('Administración', 'Carrera de gestión empresarial'),
+('Derecho', 'Carrera de ciencias jurídicas');
+GO
+
+-- Insertar Especialidades
+INSERT INTO [dbo].[Especialidades] ([nombre], [area], [descripcion]) VALUES
+('Inteligencia Artificial', 'Tecnología', 'Especialidad en IA y machine learning'),
+('Bases de Datos', 'Tecnología', 'Especialidad en gestión de datos'),
+('Cirugía', 'Medicina', 'Especialidad en procedimientos quirúrgicos'),
+('Pediatría', 'Medicina', 'Especialidad en medicina infantil'),
+('Finanzas', 'Administración', 'Especialidad en gestión financiera'),
+('Derecho Penal', 'Derecho', 'Especialidad en derecho penal');
+GO
+
+-- Insertar Profesores
+INSERT INTO [dbo].[Profesores] ([nombre], [carreraId], [especialidadId], [telefono], [email]) VALUES
+('Dr. Carlos Rodríguez', 1, 1, '+1234567890', 'carlos.rodriguez@universidad.edu'),
+('Dra. María González', 1, 2, '+1234567891', 'maria.gonzalez@universidad.edu'),
+('Dr. Roberto Silva', 2, 3, '+1234567892', 'roberto.silva@universidad.edu'),
+('Lic. Ana Martínez', 3, 5, '+1234567893', 'ana.martinez@universidad.edu');
+GO
+
+-- Insertar Estudiantes
+INSERT INTO [dbo].[Estudiantes] ([nombre], [correo], [telefono], [direccion]) VALUES
+('Juan Pérez', 'juan.perez@estudiante.edu', '+1234567894', 'Av. Universidad 123'),
+('María López', 'maria.lopez@estudiante.edu', '+1234567895', 'Calle Estudiante 456'),
+('Carlos García', 'carlos.garcia@estudiante.edu', '+1234567896', 'Plaza Central 789'),
+('Ana Torres', 'ana.torres@estudiante.edu', '+1234567897', 'Boulevard Estudiantil 101');
+GO
+
+-- Insertar Cursos
+INSERT INTO [dbo].[Cursos] ([nombre], [descripcion], [profesorId], [creditos], [horas_duracion]) VALUES
+('Programación Avanzada', 'Curso de programación en lenguajes modernos', 1, 4, 60),
+('Bases de Datos Relacionales', 'Fundamentos de diseño y gestión de BD', 2, 3, 45),
+('Anatomía Humana', 'Estudio de la estructura del cuerpo humano', 3, 5, 80),
+('Finanzas Corporativas', 'Gestión financiera en empresas', 4, 3, 45);
+GO
+
+-- Insertar Inscripciones
+INSERT INTO [dbo].[Inscripciones] ([cursoId], [estudianteId], [calificacion]) VALUES
+(1, 1, 85.5),
+(1, 2, 92.0),
+(2, 1, 88.0),
+(2, 3, 76.5),
+(3, 4, 91.5),
+(4, 2, 89.0);
+GO
+
+-- =============================================
+-- CREACIÓN DE ÍNDICES
+-- =============================================
+
+-- Índices para mejorar rendimiento
+CREATE INDEX [IX_Profesores_CarreraId] ON [dbo].[Profesores] ([carreraId]);
+CREATE INDEX [IX_Profesores_EspecialidadId] ON [dbo].[Profesores] ([especialidadId]);
+CREATE INDEX [IX_Cursos_ProfesorId] ON [dbo].[Cursos] ([profesorId]);
+CREATE INDEX [IX_Inscripciones_CursoId] ON [dbo].[Inscripciones] ([cursoId]);
+CREATE INDEX [IX_Inscripciones_EstudianteId] ON [dbo].[Inscripciones] ([estudianteId]);
+CREATE INDEX [IX_Inscripciones_Fecha] ON [dbo].[Inscripciones] ([fechaInscripcion]);
+CREATE INDEX [IX_Estudiantes_Email] ON [dbo].[Estudiantes] ([correo]);
+GO
+
+
+
+
+--************************************************************************************************************************************
+
+CREATE PROCEDURE [GET_Profesores]
+   -- @cursoId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+  -- Mostrar
+END;
+GO
+
+
+CREATE PROCEDURE [GET_Cursos]
+   -- @cursoId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+  -- Mostrar
+END;
+GO
+
+
+CREATE PROCEDURE [GET_Inscripciones]
+   -- @cursoId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+  -- Mostrar
+END;
+GO
+
+
+CREATE PROCEDURE [GET_Estudiantes]
+   -- @cursoId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+  -- Mostrar
+END;
+GO
+
+
+
+--*********************************************
+
+
+CREATE PROCEDURE [GET_ProfesoresID]
+   -- @cursoId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+  -- Mostrar
+END;
+GO
+
+
+CREATE PROCEDURE [GET_CursosID]
+   -- @cursoId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+  -- Mostrar
+END;
+GO
+
+
+CREATE PROCEDURE [GET_InscripcionesID]
+   -- @cursoId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+  -- Mostrar
+END;
+GO
+
+
+CREATE PROCEDURE [GET_EstudiantesID]
+   -- @cursoId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+  -- Mostrar
+END;
+GO
+
+
+--**************************************************************
+
+CREATE PROCEDURE [DELETE_Profesores]
+   -- @cursoId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+  -- Mostrar
+END;
+GO
+
+
+CREATE PROCEDURE [DELETE_Cursos]
+   -- @cursoId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+  -- Mostrar
+END;
+GO
+
+
+CREATE PROCEDURE [DELETE_Inscripciones]
+   -- @cursoId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+  -- Mostrar
+END;
+GO
+
+
+CREATE PROCEDURE [DELETE_Estudiantes]
+   -- @cursoId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+  -- Mostrar
+END;
+GO
+
+
+
+
+
+
