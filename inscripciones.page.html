@@ -1,0 +1,141 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Inscripciones</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- NUEVA INSCRIPCIÓN -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Nueva Inscripción</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <form (ngSubmit)="insertar()" #f="ngForm">
+        <ion-item>
+          <ion-input
+            type="number"
+            label="Curso ID"
+            labelPlacement="stacked"
+            [(ngModel)]="form.cursoId"
+            name="cursoId"
+            required
+            min="1">
+          </ion-input>
+        </ion-item>
+
+        <ion-item class="ion-margin-top">
+          <ion-input
+            type="number"
+            label="Estudiante ID"
+            labelPlacement="stacked"
+            [(ngModel)]="form.estudianteId"
+            name="estudianteId"
+            required
+            min="1">
+          </ion-input>
+        </ion-item>
+
+        <ion-item class="ion-margin-top">
+          <ion-select
+            label="Estado"
+            labelPlacement="stacked"
+            [(ngModel)]="form.estado"
+            name="estado"
+            interface="popover"
+            required>
+            <ion-select-option value="Activo">Activo</ion-select-option>
+            <ion-select-option value="Completado">Completado</ion-select-option>
+            <ion-select-option value="Cancelado">Cancelado</ion-select-option>
+            <ion-select-option value="Retirado">Retirado</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item class="ion-margin-top">
+          <ion-input
+            type="number"
+            label="Calificación (0-100, opcional)"
+            labelPlacement="stacked"
+            [(ngModel)]="form.calificacion"
+            name="calificacion"
+            min="0" max="100">
+          </ion-input>
+        </ion-item>
+
+        <ion-button
+          class="ion-margin-top"
+          expand="block"
+          type="submit"
+          [disabled]="insertLoading || f.invalid">
+          {{ insertLoading ? 'Guardando...' : 'Guardar Inscripción' }}
+        </ion-button>
+      </form>
+
+      <ion-text color="danger" *ngIf="insertError">{{ insertError }}</ion-text>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- BUSCAR POR ID -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Buscar por ID</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-input
+          type="number"
+          label="ID de inscripción"
+          labelPlacement="stacked"
+          placeholder="Ej: 1"
+          [(ngModel)]="idBuscar"
+          name="idBuscar">
+        </ion-input>
+      </ion-item>
+      <ion-button class="ion-margin-top" expand="block" (click)="buscarPorId()">Buscar</ion-button>
+
+      <ion-spinner *ngIf="loadingItem" class="ion-margin-top"></ion-spinner>
+
+      <ion-card *ngIf="detalle" class="ion-margin-top">
+        <ion-card-header>
+          <ion-card-title>Resultado</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p><strong>ID:</strong> {{ detalle.id }}</p>
+          <p><strong>Curso:</strong> {{ detalle.curso }} ({{ detalle.cursoId }})</p>
+          <p><strong>Estudiante:</strong> {{ detalle.estudiante }} ({{ detalle.estudianteId }})</p>
+          <p><strong>Estado:</strong> {{ detalle.estado }}</p>
+          <p><strong>Calificación:</strong> {{ detalle.calificacion ?? '—' }}</p>
+          <p><strong>Inscrito:</strong> {{ detalle.fechaInscripcion | date:'short' }}</p>
+        </ion-card-content>
+      </ion-card>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- LISTADO -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Listado</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-spinner *ngIf="loadingList"></ion-spinner>
+
+      <ion-list *ngIf="!loadingList">
+        <ion-item *ngFor="let i of lista">
+          <ion-label>
+            <h2>#{{ i.id }} • {{ i.curso }}</h2>
+            <p>
+              Estudiante: {{ i.estudiante }}
+              • Estado: {{ i.estado }}
+              • Calificación: {{ i.calificacion ?? '—' }}
+            </p>
+          </ion-label>
+          <ion-button color="danger" fill="clear" (click)="eliminar(i.id)">Eliminar</ion-button>
+        </ion-item>
+      </ion-list>
+
+      <ion-text color="danger" *ngIf="errorMsg">{{ errorMsg }}</ion-text>
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

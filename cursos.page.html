@@ -1,0 +1,147 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Cursos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- NUEVO CURSO -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Nuevo Curso</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <form (ngSubmit)="insertar()" #f="ngForm">
+        <ion-item>
+          <ion-input
+            label="Nombre"
+            labelPlacement="stacked"
+            [(ngModel)]="form.nombre"
+            name="nombre"
+            required>
+          </ion-input>
+        </ion-item>
+
+        <ion-item class="ion-margin-top">
+          <ion-textarea
+            label="Descripción (opcional)"
+            labelPlacement="stacked"
+            [(ngModel)]="form.descripcion"
+            name="descripcion">
+          </ion-textarea>
+        </ion-item>
+
+        <ion-item class="ion-margin-top">
+          <ion-input
+            type="number"
+            label="Profesor ID"
+            labelPlacement="stacked"
+            [(ngModel)]="form.profesorId"
+            name="profesorId"
+            required
+            min="1">
+          </ion-input>
+        </ion-item>
+
+        <ion-item class="ion-margin-top">
+          <ion-input
+            type="number"
+            label="Créditos (1-10)"
+            labelPlacement="stacked"
+            [(ngModel)]="form.creditos"
+            name="creditos"
+            min="1" max="10">
+          </ion-input>
+        </ion-item>
+
+        <ion-item class="ion-margin-top">
+          <ion-input
+            type="number"
+            label="Horas de duración (opcional)"
+            labelPlacement="stacked"
+            [(ngModel)]="form.horas_duracion"
+            name="horas_duracion"
+            min="1">
+          </ion-input>
+        </ion-item>
+
+        <ion-item class="ion-margin-top">
+          <ion-toggle
+            justify="space-between"
+            [(ngModel)]="form.activo"
+            name="activo">
+            Activo
+          </ion-toggle>
+        </ion-item>
+
+        <ion-button class="ion-margin-top" expand="block" type="submit" [disabled]="insertLoading">
+          {{ insertLoading ? 'Guardando...' : 'Guardar Curso' }}
+        </ion-button>
+      </form>
+
+      <ion-text color="danger" *ngIf="insertError">{{ insertError }}</ion-text>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- BUSCAR POR ID -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Buscar por ID</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-input
+          type="number"
+          label="ID de curso"
+          labelPlacement="stacked"
+          placeholder="Ej: 1"
+          [(ngModel)]="idBuscar"
+          name="idBuscar">
+        </ion-input>
+      </ion-item>
+      <ion-button class="ion-margin-top" expand="block" (click)="buscarPorId()">Buscar</ion-button>
+
+      <ion-spinner *ngIf="loadingItem" class="ion-margin-top"></ion-spinner>
+
+      <ion-card *ngIf="detalle" class="ion-margin-top">
+        <ion-card-header>
+          <ion-card-title>Resultado</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p><strong>ID:</strong> {{ detalle.id }}</p>
+          <p><strong>Nombre:</strong> {{ detalle.nombre }}</p>
+          <p><strong>Profesor:</strong> {{ detalle.profesor }} ({{ detalle.profesorId }})</p>
+          <p><strong>Créditos:</strong> {{ detalle.creditos }}</p>
+          <p><strong>Horas:</strong> {{ detalle.horas_duracion ?? '—' }}</p>
+          <p><strong>Activo:</strong> {{ detalle.activo ? 'Sí' : 'No' }}</p>
+          <p><strong>Creado:</strong> {{ detalle.fecha_creacion | date:'short' }}</p>
+          <p><strong>Descripción:</strong> {{ detalle.descripcion || '—' }}</p>
+        </ion-card-content>
+      </ion-card>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- LISTADO -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Listado</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-spinner *ngIf="loadingList"></ion-spinner>
+
+      <ion-list *ngIf="!loadingList">
+        <ion-item *ngFor="let c of lista">
+          <ion-label>
+            <h2>#{{ c.id }} • {{ c.nombre }}</h2>
+            <p>Profesor: {{ c.profesor }} ({{ c.profesorId }}) • Créditos: {{ c.creditos }} • Activo: {{ c.activo ? 'Sí' : 'No' }}</p>
+          </ion-label>
+          <ion-button color="danger" fill="clear" (click)="eliminar(c.id)">Eliminar</ion-button>
+        </ion-item>
+      </ion-list>
+
+      <ion-text color="danger" *ngIf="errorMsg">{{ errorMsg }}</ion-text>
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

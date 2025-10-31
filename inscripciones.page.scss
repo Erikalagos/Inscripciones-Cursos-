@@ -1,0 +1,172 @@
+:host {
+  --elegant-bg: linear-gradient(135deg, #0f172a 0%, #111827 60%, #1f2937 100%);
+  --card-bg: rgba(255,255,255,0.06);
+  --card-border: rgba(255,255,255,0.12);
+  --blur: saturate(160%) blur(10px);
+
+  --text-strong: #e5e7eb;
+  --text-muted: #9ca3af;
+
+  /* Estados */
+  --estado-activo: #3b82f6;
+  --estado-completado: #10b981;
+  --estado-cancelado: #ef4444;
+  --estado-retirado: #f59e0b;
+
+  /* Calificaciones */
+  --calif-alta: #22c55e;
+  --calif-media: #eab308;
+  --calif-baja: #ef4444;
+}
+
+ion-content {
+  --background: var(--elegant-bg);
+  color: var(--text-strong);
+}
+
+/* Toolbar */
+.toolbar-elegant {
+  --background: transparent;
+  --color: #e5e7eb;
+  backdrop-filter: var(--blur);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Cards */
+.elegant-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  backdrop-filter: var(--blur);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+.title-compact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Utils */
+.mr-8 { margin-right: 8px; }
+.ml-8 { margin-left: 8px; }
+.mt-6 { margin-top: 6px; }
+.mt-8 { margin-top: 8px; }
+.mt-12 { margin-top: 12px; }
+.block { display: block; }
+
+/* Inputs estilo “pill” */
+.input-pill {
+  --background: transparent;
+  padding: 4px;
+  border-radius: 999px;
+
+  ion-input {
+    --padding-start: 14px;
+    --border-radius: 999px;
+    --highlight-color-focused: #8b5cf6;
+    --border-color: rgba(255,255,255,0.18);
+    color: var(--text-strong);
+  }
+
+  ion-button {
+    --border-radius: 999px;
+  }
+}
+
+/* Items planos */
+.flat-item {
+  --background: transparent;
+  --color: var(--text-strong);
+
+  ion-icon {
+    color: #a78bfa;
+    margin-right: 6px;
+  }
+  .muted { color: var(--text-muted); }
+}
+
+/* Resultado interno */
+.inner-result {
+  border-radius: 18px;
+  border: 1px dashed rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.04);
+}
+
+.result-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.id-chip {
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(139,92,246,0.18);
+  color: #e9d5ff;
+}
+
+/* Badges por estado */
+ion-badge {
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: white;
+}
+.badge-activo      { background: var(--estado-activo) !important; }
+.badge-completado  { background: var(--estado-completado) !important; }
+.badge-cancelado   { background: var(--estado-cancelado) !important; }
+.badge-retirado    { background: var(--estado-retirado) !important; }
+
+/* Chip de calificación */
+ion-chip.calif-alta  { background: color-mix(in lab, var(--calif-alta) 25%, transparent); color: #dcfce7; }
+ion-chip.calif-media { background: color-mix(in lab, var(--calif-media) 25%, transparent); color: #fef9c3; }
+ion-chip.calif-baja  { background: color-mix(in lab, var(--calif-baja) 25%, transparent);  color: #fee2e2; }
+
+/* Lista */
+.row-item {
+  --background: rgba(255,255,255,0.03);
+  border-radius: 14px;
+  margin: 6px 0;
+}
+
+.avatar-soft {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(139,92,246,0.22);
+  display: grid;
+  place-items: center;
+  .avatar-text {
+    color: #ede9fe;
+    font-weight: 800;
+  }
+}
+
+.row-title { color: var(--text-strong); font-weight: 700; letter-spacing: .2px; }
+.row-sub   { color: var(--text-muted); margin-top: 4px; }
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 18px 8px;
+  color: var(--text-muted);
+
+  ion-icon {
+    font-size: 42px;
+    opacity: .45;
+    margin-bottom: 8px;
+  }
+}
+
+/* FAB */
+.fab-elegant {
+  --background: #8b5cf6;
+  --background-activated: #7c3aed;
+  --background-hover: #7c3aed;
+  --color: white;
+}
